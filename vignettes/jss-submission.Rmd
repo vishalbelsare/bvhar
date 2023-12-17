@@ -209,14 +209,21 @@ In multivariate time series task, we want to forecast or structurally analyze. @
 
 ## Vector autoregressive and heterogeneous autoregressive models {#sec:vhar short-title="VHAR"}
 
-Let $\{ Y_{it} \colon i = 1, 2 \ldots k, t = 1, 2, \ldots, T \}$ be the daily time series of $i$-th variable at $t$-th time point and let $\bfY_t \defn (Y_{1t}, Y_{2t}, \ldots, Y_{kt})^\tr$ be a $k$-dimensional vector at time $t$. We formulate VAR model of lag $p$ as follows.
+We are interested in modeling the $k$-dimensional daily time series $\{ \bfY_t = (Y_{1t}, Y_{2t}, \ldots, Y_{kt})^\tr \colon i = 1, 2, \ldots, T \}$. VAR model of lag $p$ (VAR($p$)) is one of the most popular model. We formulate the model as follows.
 
 \begin{equation}
   \bfY_t = \bfc + A_1 \bfY_{t - 1} + \cdots + A_p \bfY_{t - p} + \bfeps_t
-\label{eq:vareq}
+  \label{eq:vareq}
 \end{equation}
 
 where $\bfeps_t$ is innovation vector series following multivariate normal distribution of mean zero.
+
+
+\begin{equation}
+  \bfY_t = \bfc + \Phi^{(d)} \bfY_{t - 1} + \Phi^{(w)} \bfY_{t - 1}^{(w)} + \Phi^{(m)} \bfY_{t - 1}^{(m)} + \bfeps_t
+  \label{eq:vhareq}
+\end{equation}
+
 
 ## Minnesota priors {#sec:minnesota short-title="minn"}
 
