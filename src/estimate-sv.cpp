@@ -1,7 +1,7 @@
 #include <RcppEigen.h>
 #include "bvhardraw.h"
-#include <progress.hpp>
-#include <progress_bar.hpp>
+#include "bvharprogress.h"
+#include "bvharinterrupt.h"
 
 //' VAR-SV by Gibbs Sampler
 //' 
@@ -20,6 +20,10 @@
 //' @param init_contem_global Initial global shrinkage for Cholesky factor in Horseshoe
 //' @param grp_id Unique group id
 //' @param grp_mat Group matrix
+//' @param prior_sig_shp Inverse-Gamma prior shape of state variance
+//' @param prior_sig_scl Inverse-Gamma prior scale of state variance
+//' @param prior_init_mean Noraml prior mean of initial state
+//' @param prior_init_prec Normal prior precision of initial state
 //' @param coef_spike SD of spike normal
 //' @param coef_slab_weight SD of slab normal
 //' @param chol_spike Standard deviance for cholesky factor Spike normal distribution
@@ -47,6 +51,10 @@ Rcpp::List estimate_var_sv(int num_iter, int num_burn,
                            Eigen::VectorXd init_contem_global,
                            Eigen::VectorXi grp_id,
                            Eigen::MatrixXd grp_mat,
+													 Eigen::VectorXd prior_sig_shp,
+													 Eigen::VectorXd prior_sig_scl,
+													 Eigen::VectorXd prior_init_mean,
+													 Eigen::MatrixXd prior_init_prec,
                            Eigen::VectorXd coef_spike,
                            Eigen::VectorXd coef_slab,
                            Eigen::VectorXd coef_slab_weight,
@@ -97,10 +105,6 @@ Rcpp::List estimate_var_sv(int num_iter, int num_burn,
       prior_alpha_mean = Eigen::VectorXd::Zero(num_coef);
       break;
   }
-  Eigen::VectorXd prior_sig_shp = 3 * Eigen::VectorXd::Ones(dim); // nu_h = 3 * 1_k
-  Eigen::VectorXd prior_sig_scl = .01 * Eigen::VectorXd::Ones(dim); // S_h = .1^2 * 1_k
-  Eigen::VectorXd prior_init_mean = Eigen::VectorXd::Ones(dim); // b0 = 1
-  Eigen::MatrixXd prior_init_prec = Eigen::MatrixXd::Identity(dim, dim) / 10; // Inverse of B0 = .1 * I
   Eigen::MatrixXd coef_mat = (x.transpose() * x).llt().solve(x.transpose() * y); // LSE
   // record------------------------------------------------
   Eigen::MatrixXd coef_record = Eigen::MatrixXd::Zero(num_iter + 1, num_coef); // alpha in VAR
@@ -163,9 +167,10 @@ Rcpp::List estimate_var_sv(int num_iter, int num_burn,
   Eigen::MatrixXd global_shrinkage_mat = Eigen::MatrixXd::Zero(dim_design, dim);
   Eigen::VectorXd grp_vec = vectorize_eigen(grp_mat);
   // Start Gibbs sampling-----------------------------------
-  Progress p(num_iter, display_progress);
+	bvharprogress bar(num_iter, display_progress);
+	bvharinterrupt();
   for (int i = 1; i < num_iter + 1; i ++) {
-    if (Progress::check_abort()) {
+		if (bvharinterrupt::is_interrupted()) {
       if (prior_type == 2) {
         return Rcpp::List::create(
           Rcpp::Named("alpha_record") = coef_record,
@@ -195,7 +200,10 @@ Rcpp::List estimate_var_sv(int num_iter, int num_burn,
         Rcpp::Named("sigh_record") = lvol_sig_record
       );
     }
-    p.increment();
+		bar.increment();
+		if (display_progress) {
+			bar.update();
+		}
     // 1. alpha----------------------------
     chol_lower = build_inv_lower(dim, contem_coef_record.row(i - 1));
     switch(prior_type) {
