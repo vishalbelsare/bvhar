@@ -3,7 +3,8 @@
 
 #include "bvharomp.h"
 #include <Rcpp.h>
-#include <atomic>
+
+namespace bvhar {
 
 class bvharprogress {
 public:
@@ -18,4 +19,6 @@ private:
 	bool _verbose;
 };
 
-#endif
+} // namespace bvhar
+
+#endif // BVHARPROGRESS_H

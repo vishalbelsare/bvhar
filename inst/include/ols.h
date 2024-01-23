@@ -1,8 +1,10 @@
 #ifndef OLS_H
 #define OLS_H
 
-#include <RcppEigen.h>
+#include "bvhardesign.h"
 #include <memory> // std::unique_ptr in source file
+
+namespace bvhar {
 
 class MultiOls {
 public:
@@ -73,4 +75,6 @@ protected:
 	Eigen::MatrixXd har_trans;
 };
 
-#endif
+} // namespace bvhar
+
+#endif // OLS_H

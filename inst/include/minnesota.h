@@ -1,9 +1,11 @@
 #ifndef MINNESOTA_H
 #define MINNESOTA_H
 
-#include <RcppEigen.h>
+// #include <RcppEigen.h>
 #include "bvhardesign.h"
 #include <memory> // std::unique_ptr
+
+namespace bvhar {
 
 struct MinnSpec {
 	Eigen::VectorXd _sigma;
@@ -114,4 +116,6 @@ private:
 	Eigen::MatrixXd dummy_response;
 };
 
-#endif
+} // namespace bvhar
+
+#endif // MINNESOTA_H

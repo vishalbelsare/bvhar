@@ -1,4 +1,6 @@
-#include "minnesota.h"
+#include <minnesota.h>
+
+namespace bvhar {
 
 MinnSpec::MinnSpec(Rcpp::List& bayes_spec)
 : _sigma(Rcpp::as<Eigen::VectorXd>(bayes_spec["sigma"])),
@@ -157,3 +159,5 @@ Rcpp::List MinnBvharL::returnMinnRes() {
 	mn_res["y"] = data;
 	return mn_res;
 }
+
+} // namespace bvhar
