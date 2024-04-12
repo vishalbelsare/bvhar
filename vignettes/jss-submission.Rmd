@@ -35,17 +35,17 @@ author:
   #   # use a different affiliation in adress field (differently formated here)
   #   affiliation2: Universitat Autònoma de Barcelona
 title:
-  formatted: "Bayesian Modeling of Multivariate Time Series Using \\pkg{bvhar} Package in \\proglang{R}"
+  formatted: "Modeling and Forecasting Multivariate Time Series Using \\pkg{bvhar} Package in \\proglang{R}"
   # If you use tex in the formatted title, also supply version without
-  plain:     "Bayesian Modeling of Multivariate Time Series Using bvhar Package in R"
+  plain:     "Modeling and Forecasting Multivariate Time Series Using bvhar Package in R"
   # For running headers, if needed
-  short:     "\\pkg{bvhar}: Bayesian Modeling of Multivariate Time Series"
+  short:     "\\pkg{bvhar}: Modeling and Forecasting Multivariate Time Series"
 abstract: >
   The abstract of the article.
 keywords:
   # at least one keyword must be supplied
-  formatted: [vector autoregressive model, vector heterogeneous autoregressive model, bayesian vector heterogeneous autoregressive model, bayesian vector autoregressiv model, time series, forecast, "\\proglang{RcppEigen}", "\\proglang{R}"]
-  plain:     [vector autoregressive model, vector heterogeneous autoregressive model, bayesian vector heterogeneous autoregressive model, bayesian vector autoregressiv model, time series, forecast, RcppEigen, R]
+  formatted: [vector autoregressive model, vector heterogeneous autoregressive model, bayesian econometrics, time series, forecast, structural analysis, "\\proglang{RcppEigen}", "\\proglang{R}"]
+  plain:     [vector autoregressive model, vector heterogeneous autoregressive model, bayesian econometrics, time series, forecast, structural analysis, RcppEigen, R]
 preamble: >
   \usepackage{amsmath}
   \usepackage{orcidlink,thumbpdf,lmodern}
@@ -231,5 +231,42 @@ where $\bfeps_t$ is innovation vector series following multivariate normal distr
 
 ## Continuous shrinkage priors {#sec:shrinkage short-title="shrinkage"}
 
+<!-- ## Structural analysis {#sec:structural short-title="structural"}
+
+## Forecasting {#sec:forecast short-title="forecasting"} -->
+
 # The \pkg{bvhar} package {#sec:bvharpkg short-title="package"}
 
+# Empirical Analysis: CBOE ETF Volatility Index {#sec:analysis short-title="example"}
+
+```{r}
+library(bvhar)
+etf_vix
+```
+
+## Analyzing with frequentist models
+
+
+## Setting the priors
+
+<!-- Minnesota prior -->
+
+
+<!-- Prior for SV -->
+
+<!-- Intercept term -->
+
+<!-- SSVS prior -->
+
+<!-- Horseshoe prior -->
+
+
+## Bayesian modeling
+
+## Model selection
+
+## Structural analysis
+
+## Forecasting
+
+# Conclusion

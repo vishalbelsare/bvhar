@@ -1,0 +1,163 @@
+\documentclass[
+]{jss}
+
+%% recommended packages
+\usepackage{orcidlink,thumbpdf,lmodern}
+
+\usepackage[utf8]{inputenc}
+
+\author{
+Young Geun Kim~\orcidlink{0000-0001-8651-1167}\\Sungkyunkwan
+University \And Changryong Baek\\Sungkyunkwan University
+}
+\title{Modeling and Forecasting Multivariate Time Series Using
+\pkg{bvhar} Package in \proglang{R}}
+
+\Plainauthor{Young Geun Kim, Changryong Baek}
+\Plaintitle{Modeling and Forecasting Multivariate Time Series Using
+bvhar Package in R}
+\Shorttitle{\pkg{bvhar}: Modeling and Forecasting Multivariate Time
+Series}
+
+
+\Abstract{
+The abstract of the article.
+}
+
+\Keywords{vector autoregressive model, vector heterogeneous
+autoregressive model, bayesian econometrics, time
+series, forecast, structural
+analysis, \proglang{RcppEigen}, \proglang{R}}
+\Plainkeywords{vector autoregressive model, vector heterogeneous
+autoregressive model, bayesian econometrics, time
+series, forecast, structural analysis, RcppEigen, R}
+
+%% publication information
+%% \Volume{50}
+%% \Issue{9}
+%% \Month{June}
+%% \Year{2012}
+%% \Submitdate{}
+%% \Acceptdate{2012-06-04}
+
+\Address{
+    Young Geun Kim\\
+    Sungkyunkwan University\\
+    Department of Statistics\\
+Sungkyunkwan University\\
+Seoul, 03063, Korea\\
+  E-mail: \email{dudrms33@g.skku.edu}\\
+  URL: \url{https://ygeunkim.github.io}\\~\\
+      Changryong Baek\\
+    Sungkyunkwan University\\
+    Department of Statistics\\
+Sungkyunkwan University\\
+Seoul, 03063, Korea\\
+  
+  
+  }
+
+
+% tightlist command for lists without linebreak
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+
+
+
+
+\usepackage{amsmath} \usepackage{orcidlink,thumbpdf,lmodern} \newcommand{\calW}{{\mathcal W}} \newcommand{\bbA}{{\mathbb A}} \newcommand{\bbB}{{\mathbb B}} \newcommand{\bbW}{{\mathbb W}} \newcommand{\bbE}{{\mathbb E}} \newcommand{\bbZ}{{\mathbb Z}} \newcommand{\bbR}{{\mathbb R}} \newcommand{\bbN}{{\mathbb N}} \newcommand{\bbC}{{\mathbb C}} \newcommand{\bbL}{{\mathbb L}} \newcommand{\bbP}{{\mathbb P}} \newcommand{\bbQ}{{\mathbb Q}} \newcommand{\bbF}{{\mathbb F}} \newcommand{\bbX}{{\mathbb X}} \newcommand{\bfa}{{\mathbf a}} \newcommand{\bfb}{{\mathbf b}} \newcommand{\bfd}{{\mathbf d}} \newcommand{\bfT}{{\mathbf T}} \newcommand{\bfA}{{\mathbf A}} \newcommand{\bfB}{{\mathbf B}} \newcommand{\bfX}{{\mathbf X}} \newcommand{\bfU}{{\mathbf U}} \newcommand{\bfY}{{\mathbf Y}} \newcommand{\bfy}{{\mathbf y}} \newcommand{\bfx}{{\mathbf x}} \newcommand{\bfu}{{\mathbf u}} \newcommand{\bfV}{{\mathbf V}} \newcommand{\bfv}{{\mathbf v}} \newcommand{\bfW}{{\mathbf W}} \newcommand{\bfw}{{\mathbf w}} \newcommand{\bfZ}{{\mathbf Z}} \newcommand{\bfz}{{\mathbf z}} \newcommand{\bfR}{{\mathbf R}} \newcommand{\bfh}{{\mathbf h}} \newcommand{\bfr}{{\mathbf r}} \newcommand{\bfN}{{\mathbf N}} \newcommand{\bfC}{{\mathbf C}} \newcommand{\bfc}{{\mathbf c}} \newcommand{\bfp}{{\mathbf p}} \newcommand{\bfgamma}{{\boldsymbol \gamma}} \newcommand{\bfeps}{{\boldsymbol \epsilon}} \newcommand{\bfmu}{{\boldsymbol \mu}} \newcommand{\bbphi}{\mathbb \Phi} \newcommand{\autocov}[1]{\Gamma(#1)} \newcommand{\calA}{\mathcal{A}} \newcommand{\calM}{\mathcal{M}} \newcommand{\calH}{\mathcal{H}} \newcommand{\calK}{\mathcal{K}} \newcommand{\calP}{\mathcal{P}} \newcommand{\sfA}{\mathsf{A}} \newcommand{\sfB}{\mathsf{B}} \newcommand{\designvhar}{\mathbb{X}_1} \newcommand{\designvar}{\mathbb{X}_0} \newcommand{\response}{\mathbb{Y}_0} \newcommand{\error}{\mathbb{Z}_0} \newcommand{\designbvhar}{\mathbb{X}_\ast} \newcommand{\responsebvharS}{\mathbb{Y}_\ast} \newcommand{\responsebvharL}{\mathbb{Y}_{\#}} \newcommand{\designdummy}{\mathbb{X}_H} \newcommand{\responsedummy}{\mathbb{Y}_H} \newcommand{\designLdummy}{\mathbb{X}_L} \newcommand{\responseLdummy}{\mathbb{Y}_L} \newcommand{\errorbvharS}{\mathbb{Z}_\ast} \newcommand{\errorbvharL}{\mathbb{Z}_{\#}} \newcommand{\errordummy}{\mathbb{Z}_H} \newcommand{\errorLdummy}{\mathbb{Z}_L} \newcommand {\normal}{{\mathcal N}} \newcommand {\MN}{{\mathcal {MN}}} \newcommand {\IW}{{\mathcal {IW}}} \newcommand {\wishart}{{\mathcal {W}}} \newcommand {\IG}{{\mathcal {IG}}} \newcommand {\gamdistn}{{\mathcal {G}}} \newcommand {\ber}{{\mathcal {Ber}}} \newcommand {\cauchy}{{\mathcal {C}}} \newcommand{\bedistn}{\mathcal{Beta}} \newcommand{\scolon}{\mathpunct{;}} \newcommand{\defn}{\mathpunct{:=}} \newcommand{\distn}{\stackrel{\mathcal{D}}{=}} \newcommand{\zero}{\mathbf{0}} \newcommand{\one}{\mathbf{1}} \newcommand{\diag}{\mathrm{diag}} \newcommand{\cterm}{\text{if constant term exists}} \newcommand{\cnot}{\text{if constant term does not exist}} \newcommand{\iid}{\stackrel{\mathrm{iid}}{\sim}} \newcommand{\indep}{\stackrel{\mathrm{indep}}{\sim}} \newcommand{\priormean}{M_0} \newcommand{\priormnscale}{\Omega_0} \newcommand{\prioriwscale}{\Psi_0} \newcommand{\prioriwdf}{\nu_0} \newcommand{\marginaldistn}[1]{\left( #1 \right)} \newcommand{\condndistn}[2]{\left( #1 \mid #2 \right)} \newcommand{\marginaldensity}[1]{\left[ #1 \right]} \newcommand{\condndensity}[2]{\left[ #1 \mid #2 \right]} \newcommand{\tr}{\prime} \newcommand{\bbY}{{\mathbb Y}} \newcommand{\bfalpha}{{\boldsymbol \alpha}} \newcommand{\bfphi}{{\boldsymbol \phi}} \newcommand{\bfeta}{{\boldsymbol \eta}} \newcommand{\bfomega}{{\boldsymbol \omega}} \newcommand{\bfpsi}{{\boldsymbol \psi}} \newcommand{\bfrho}{{\boldsymbol \rho}}
+
+\begin{document}
+
+
+
+\section{Introduction}\label{introduction}
+
+In multivariate time series task, we want to forecast or structurally
+analyze. \citet{banbura2010} had shown that BVAR models can improve
+forecasting as well as provide realistic structural analysis based on
+its shrinkage structure.
+
+\section{Econometric framework}\label{sec:econ}
+
+\pkg{bvhar} deals with various types of models, including vector
+autoregressive (VAR) models and vector heterogeneous autoregressive
+(VHAR) models; both frequentist and Bayesian approaches. In this
+section, we specify these models and introduce prior distributions used
+in Bayesian modeling.
+
+\subsection[VHAR]{Vector autoregressive and heterogeneous autoregressive
+models}\label{sec:vhar}
+
+We are interested in modeling the \(k\)-dimensional daily time series
+\(\{ {\mathbf Y}_t = (Y_{1t}, Y_{2t}, \ldots, Y_{kt})^\prime\colon i = 1, 2, \ldots, T \}\).
+VAR model of lag \(p\) (VAR(\(p\))) is one of the most popular model. We
+formulate the model as follows.
+
+\begin{equation}
+  {\mathbf Y}_t = {\mathbf c}+ A_1 {\mathbf Y}_{t - 1} + \cdots + A_p {\mathbf Y}_{t - p} + {\boldsymbol \epsilon}_t
+  \label{eq:vareq}
+\end{equation}
+
+where \({\boldsymbol \epsilon}_t\) is innovation vector series following
+multivariate normal distribution of mean zero.
+
+\begin{equation}
+  {\mathbf Y}_t = {\mathbf c}+ \Phi^{(d)} {\mathbf Y}_{t - 1} + \Phi^{(w)} {\mathbf Y}_{t - 1}^{(w)} + \Phi^{(m)} {\mathbf Y}_{t - 1}^{(m)} + {\boldsymbol \epsilon}_t
+  \label{eq:vhareq}
+\end{equation}
+
+\subsection[minn]{Minnesota priors}\label{sec:minnesota}
+
+\subsection[sv]{Stochastic volatility models}\label{sec:sv}
+
+\subsection[shrinkage]{Continuous shrinkage priors}\label{sec:shrinkage}
+
+\section[package]{The \pkg{bvhar} package}\label{sec:bvharpkg}
+
+\section[example]{Empirical Analysis: CBOE ETF Volatility
+Index}\label{sec:analysis}
+
+\begin{CodeChunk}
+\begin{CodeInput}
+R> library(bvhar)
+R> etf_vix
+\end{CodeInput}
+\begin{CodeOutput}
+# A tibble: 905 x 9
+   GVZCLS OVXCLS VXFXICLS VXEEMCLS VXSLVCLS EVZCLS VXXLECLS VXGDXCLS
+    <dbl>  <dbl>    <dbl>    <dbl>    <dbl>  <dbl>    <dbl>    <dbl>
+ 1   21.5   36.5     30.2     30.1     44.5   13.2     27.5     33.5
+ 2   21.5   35.4     28.9     29.5     42.9   12.6     26.6     33.0
+ 3   22.3   35.5     29.1     29.8     43.5   13.1     27.6     33.8
+ 4   21.6   36.6     28.5     30.0     42.8   12.8     27.6     33.5
+ 5   21.2   35.6     29.5     31.1     43.5   13.3     27.8     32.8
+ 6   21.4   34.8     29.1     30.7     44.0   13.2     27.5     34.0
+ 7   21.6   34.0     28.7     30.2     44.5   13.2     27.1     35.1
+ 8   21.1   32.6     28.0     28.0     42.6   12.8     26.8     33.8
+ 9   20.3   33.5     28.9     27.8     41.0   12.7     25.3     33.0
+10   19.6   33.4     28.0     26.1     40.5   12.4     23.9     31.0
+# i 895 more rows
+# i 1 more variable: VXEWZCLS <dbl>
+\end{CodeOutput}
+\end{CodeChunk}
+
+\subsection{Analyzing with frequentist
+models}\label{analyzing-with-frequentist-models}
+
+\subsection{Setting the priors}\label{setting-the-priors}
+
+\subsection{Bayesian modeling}\label{bayesian-modeling}
+
+\subsection{Model selection}\label{model-selection}
+
+\subsection{Structural analysis}\label{structural-analysis}
+
+\subsection{Forecasting}\label{forecasting}
+
+\renewcommand\refname{Conclusion}
+\bibliography{refs.bib}
+
+
+
+\end{document}
