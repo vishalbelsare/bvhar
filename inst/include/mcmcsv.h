@@ -144,8 +144,8 @@ struct SsvsParams : public SvParams {
 	Eigen::VectorXd _contem_spike;
 	Eigen::VectorXd _contem_slab;
 	Eigen::VectorXd _contem_weight;
-	double _coef_s1;
-	double _coef_s2;
+	Eigen::VectorXd _coef_s1;
+	Eigen::VectorXd _coef_s2;
 	double _contem_s1;
 	double _contem_s2;
 
@@ -164,7 +164,7 @@ struct SsvsParams : public SvParams {
 		_contem_spike(Rcpp::as<Eigen::VectorXd>(ssvs_spec["chol_spike"])),
 		_contem_slab(Rcpp::as<Eigen::VectorXd>(ssvs_spec["chol_slab"])),
 		_contem_weight(Rcpp::as<Eigen::VectorXd>(ssvs_spec["chol_mixture"])),
-		_coef_s1(ssvs_spec["coef_s1"]), _coef_s2(ssvs_spec["coef_s2"]),
+		_coef_s1(Rcpp::as<Eigen::VectorXd>(ssvs_spec["coef_s1"])), _coef_s2(Rcpp::as<Eigen::VectorXd>(ssvs_spec["coef_s2"])),
 		_contem_s1(ssvs_spec["chol_s1"]), _contem_s2(ssvs_spec["chol_s2"]) {}
 };
 
@@ -299,6 +299,17 @@ struct SvRecords {
 		lvol_record.row(id) = lvol_draw.transpose().reshaped();
 		lvol_sig_record.row(id) = lvol_sig;
 		lvol_init_record.row(id) = lvol_init;
+	}
+	Eigen::VectorXd computeActivity(double level) {
+		Eigen::VectorXd lower_ci(coef_record.cols());
+		Eigen::VectorXd upper_ci(coef_record.cols());
+		Eigen::VectorXd selection(coef_record.cols());
+		for (int i = 0; i < coef_record.cols(); ++i) {
+			// lower_ci[i] = quantile_lower(coef_record.col(i), level / 2);
+			// upper_ci[i] = quantile_upper(coef_record.col(i), 1 - level / 2);
+			selection[i] = quantile_lower(coef_record.col(i), level / 2) * quantile_upper(coef_record.col(i), 1 - level / 2) < 0 ? 0.0 : 1.1;
+		}
+		return selection;
 	}
 };
 
@@ -783,7 +794,7 @@ private:
 	Eigen::VectorXd coef_slab;
 	Eigen::VectorXd contem_spike;
 	Eigen::VectorXd contem_slab;
-	double coef_s1, coef_s2;
+	Eigen::VectorXd coef_s1, coef_s2;
 	double contem_s1, contem_s2;
 	Eigen::VectorXd prior_sd;
 	Eigen::VectorXd slab_weight; // pij vector
