@@ -654,6 +654,18 @@ inline void minnesota_lambda(double& lambda, double& shape, double& rate, Eigen:
 	lambda = sim_gig(1, shape - mn_size / 2, 2 * rate, gig_chi, rng)[0];
 }
 
+inline void minnesota_local(Eigen::VectorXd& local_lev, double& local_gam_param,
+														Eigen::Ref<Eigen::VectorXd> coef, Eigen::Ref<Eigen::VectorXd> coef_mean,
+														Eigen::VectorXd& lambda, Eigen::MatrixXd& coef_prec) {
+	for (int i = 0; i < local_lev.size(); ++i) {
+		local_lev[i] = sim_gig(1,
+			local_gam_param - .5,
+			local_gam_param,
+			(coef[i] - coef_mean[i]) * (coef[i] - coef_mean[i]) / (lambda[i] * lambda[i] * coef_prec(i, i))
+		)[0];
+	}
+}
+
 // Generating contemporaneous lambda of Minnesota-SV
 // 
 // @param lambda lambda1 or lambda2
