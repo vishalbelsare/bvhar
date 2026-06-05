@@ -1,0 +1,16 @@
+# bvhar Getting Started
+
+## OpenMP
+
+OpenMP multithreading is used when conducting parallel chains MCMC. If OpenMP is not enabled, the chains are run sequentially. `bvhar` provides OpenMP checking functions.
+
+```{python}
+from bvhar.utils import checkomp
+checkomp.check_omp()
+```
+
+`True` if enabled, `False` if not:
+
+```{python}
+checkomp.is_omp()
+```

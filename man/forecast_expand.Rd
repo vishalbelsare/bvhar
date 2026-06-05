@@ -2,16 +2,112 @@
 % Please edit documentation in R/summary-forecast.R
 \name{forecast_expand}
 \alias{forecast_expand}
+\alias{forecast_expand.olsmod}
+\alias{forecast_expand.normaliw}
+\alias{forecast_expand.ldltmod}
+\alias{forecast_expand.svmod}
 \title{Out-of-sample Forecasting based on Expanding Window}
 \usage{
-forecast_expand(object, n_ahead, y_test)
+forecast_expand(
+  object,
+  n_ahead,
+  y_test,
+  level = 0.05,
+  newxreg = NULL,
+  num_thread = 1,
+  ...
+)
+
+\method{forecast_expand}{olsmod}(
+  object,
+  n_ahead,
+  y_test,
+  level = 0.05,
+  newxreg = NULL,
+  num_thread = 1,
+  ...
+)
+
+\method{forecast_expand}{normaliw}(
+  object,
+  n_ahead,
+  y_test,
+  level = 0.05,
+  newxreg = NULL,
+  num_thread = 1,
+  use_fit = TRUE,
+  ...
+)
+
+\method{forecast_expand}{ldltmod}(
+  object,
+  n_ahead,
+  y_test,
+  level = 0.05,
+  newxreg = NULL,
+  num_thread = 1,
+  stable = FALSE,
+  sparse = FALSE,
+  med = FALSE,
+  lpl = FALSE,
+  mcmc = TRUE,
+  use_fit = TRUE,
+  verbose = FALSE,
+  ...
+)
+
+\method{forecast_expand}{svmod}(
+  object,
+  n_ahead,
+  y_test,
+  level = 0.05,
+  newxreg = NULL,
+  num_thread = 1,
+  use_sv = TRUE,
+  stable = FALSE,
+  sparse = FALSE,
+  med = FALSE,
+  lpl = FALSE,
+  mcmc = TRUE,
+  use_fit = TRUE,
+  verbose = FALSE,
+  ...
+)
 }
 \arguments{
 \item{object}{Model object}
 
 \item{n_ahead}{Step to forecast in rolling window scheme}
 
-\item{y_test}{Test data to be compared. Use \code{\link[=divide_ts]{divide_ts()}} if you don't have separate evaluation dataset.}
+\item{y_test}{Test data to be compared. Use \code{\link[=divide_ts]{divide_ts()}} if you don't have separate evaluation dataset.
+Use numeric, the length of test period, if \code{object} is the full sample result.
+Numeric \code{y_test} will automatically splits \code{object$y}.
+In this case, \code{use_fit} is forced to become \code{FALSE}.}
+
+\item{level}{Specify alpha of confidence interval level 100(1 - alpha) percentage. By default, .05.}
+
+\item{newxreg}{New values for exogenous variables.
+Should have the same row numbers as \code{y_test}.}
+
+\item{num_thread}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}} Number of threads}
+
+\item{...}{Additional arguments.}
+
+\item{use_fit}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}} Use \code{object} result for the first window. By default, \code{TRUE}.}
+
+\item{stable}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}} Filter only stable coefficient draws in MCMC records.}
+
+\item{sparse}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}} Apply restriction. By default, \code{FALSE}.}
+
+\item{med}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}} If \code{TRUE}, use median of forecast draws instead of mean (default).}
+
+\item{lpl}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}} Compute log-predictive likelihood (LPL). By default, \code{FALSE}.}
+
+\item{mcmc}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}} If \code{TRUE}, run new MCMC in new windows. By default, \code{TRUE}.}
+
+\item{verbose}{Print the progress bar in the console. By default, \code{FALSE}.}
+
+\item{use_sv}{Use SV term}
 }
 \value{
 \code{predbvhar_expand} \link{class}
@@ -25,7 +121,4 @@ It moves the window ahead and forecast h-ahead in \code{y_test} set.
 }
 \references{
 Hyndman, R. J., & Athanasopoulos, G. (2021). \emph{Forecasting: Principles and practice} (3rd ed.). OTEXTS. \url{https://otexts.com/fpp3/}
-}
-\seealso{
-See \link{ts_forecasting_cv} for out-of-sample forecasting methods.
 }

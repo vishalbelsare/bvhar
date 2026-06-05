@@ -1,0 +1,66 @@
+# Render doxygen to github page repo
+on:
+  push:
+    branches: [main, master, develop, release/*]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+  
+name: doxygen
+
+jobs:
+  doxygen:
+    runs-on: ubuntu-latest
+    # Only restrict concurrency for non-PR jobs
+    concurrency:
+      group: quartodoc-${{ github.event_name != 'pull_request' || github.run_id }}
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Doxygen
+        run: sudo apt-get install -y doxygen graphviz
+      
+      - name: Extract version number from DESCRIPTION
+        run: |
+          VERSION=$(grep '^Version:' DESCRIPTION | cut -d ' ' -f 2)
+          sed -i "s|BVHAR_VERSION|${VERSION}|" inst/doxygen/Doxyfile
+    
+      - name: Render doxygen
+        run: doxygen inst/doxygen/Doxyfile
+    
+      - name: Create .nojekyll
+        run: sudo touch inst/doxygen/html/.nojekyll
+
+      - name: Set target folder
+        # run: |
+        #   BRANCH=${GITHUB_REF##*/}
+        #   if [ "$BRANCH" == "develop" ]; then
+        #     echo "TARGET_FOLDER=package/bvhar/dev/cpp" >> $GITHUB_ENV
+        #   else
+        #     echo "TARGET_FOLDER=package/bvhar/cpp" >> $GITHUB_ENV
+        #   fi
+        run: |
+          BRANCH=${GITHUB_REF##*/}
+          if [ "$BRANCH" == "develop" ]; then
+            echo "TARGET_FOLDER=dev/cpp" >> $GITHUB_ENV
+          else
+            echo "TARGET_FOLDER=cpp" >> $GITHUB_ENV
+          fi
+        shell: bash
+
+      - name: Deploy to GitHub pages 🚀
+        if: github.event_name != 'pull_request'
+        uses: JamesIves/github-pages-deploy-action@v4.6.1
+        with:
+          # token: ${{ secrets.YGEUNKIM_PAGE_PAT }}
+          # repository-name: ygeunkim/ygeunkim.github.io
+          clean: false
+          # branch: master
+          branch: gh-pages
+          folder: inst/doxygen/html
+          # target-folder: package/bvhar/cpp
+          target-folder: ${{ env.TARGET_FOLDER }}

@@ -1,8 +1,22 @@
+## Patch version update
+
+In this version, we
+
+- Fixed wrong algorithms.
+- Added some features.
+
+## Test environments
+
+- Local: macOS 26.5.1 (aarch64-apple-darwin20), R 4.5.2
+- Github actions
+    - ubuntu-latest: R-devel, R-release, R-oldrel-1, R-oldrel-2, R-oldrel-3
+    - macOS-latest: R-release
+    - windows-latest: R-release, R-oldrel-3
+- win-builder: devel
+
 ## R CMD check results
 
-0 errors | 0 warnings | 1 note
-
-* HTML validation: It seems inevitable NOTE in local machine (aarch64-apple-darwin20) check. I got the same one last time but had no problem in CRAN check.
+0 errors | 0 warnings | 0 notes
 
 ## revdepcheck results
 

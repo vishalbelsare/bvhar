@@ -5,42 +5,43 @@
 #' @param object Model object
 #' @param ... not used
 #' @return [matrix] object with appropriate dimension.
+#' @name coef
 #' @export
 coef.varlse <- function(object, ...) {
   object$coefficients
 }
 
-#' @rdname coef.varlse
+#' @rdname coef
 #' @export
 coef.vharlse <- function(object, ...) {
   object$coefficients
 }
 
-#' @rdname coef.varlse
+#' @rdname coef
 #' @export
 coef.bvarmn <- function(object, ...) {
   object$coefficients
 }
 
-#' @rdname coef.varlse
+#' @rdname coef
 #' @export
 coef.bvarflat <- function(object, ...) {
   object$coefficients
 }
 
-#' @rdname coef.varlse
+#' @rdname coef
 #' @export
 coef.bvharmn <- function(object, ...) {
   object$coefficients
 }
 
-#' @rdname coef.varlse
+#' @rdname coef
 #' @export
 coef.bvharsp <- function(object, ...) {
   object$coefficients
 }
 
-#' @rdname coef.varlse
+#' @rdname coef
 #' @export
 coef.summary.bvharsp <- function(object, ...) {
   object$coefficients
@@ -53,30 +54,31 @@ coef.summary.bvharsp <- function(object, ...) {
 #' @param object Model object
 #' @param ... not used
 #' @return [matrix] object.
+#' @name residuals
 #' @export
 residuals.varlse <- function(object, ...) {
   object$residuals
 }
 
-#' @rdname residuals.varlse
+#' @rdname residuals
 #' @export
 residuals.vharlse <- function(object, ...) {
   object$residuals
 }
 
-#' @rdname residuals.varlse
+#' @rdname residuals
 #' @export
 residuals.bvarmn <- function(object, ...) {
   object$residuals
 }
 
-#' @rdname residuals.varlse
+#' @rdname residuals
 #' @export
 residuals.bvarflat <- function(object, ...) {
   object$residuals
 }
 
-#' @rdname residuals.varlse
+#' @rdname residuals
 #' @export
 residuals.bvharmn <- function(object, ...) {
   object$residuals
@@ -89,140 +91,185 @@ residuals.bvharmn <- function(object, ...) {
 #' @param object Model object
 #' @param ... not used
 #' @return [matrix] object.
+#' @name fitted
 #' @export
 fitted.varlse <- function(object, ...) {
   object$fitted.values
 }
 
-#' @rdname fitted.varlse
+#' @rdname fitted
 #' @export
 fitted.vharlse <- function(object, ...) {
   object$fitted.values
 }
 
-#' @rdname fitted.varlse
+#' @rdname fitted
 #' @export
 fitted.bvarmn <- function(object, ...) {
   object$fitted.values
 }
 
-#' @rdname fitted.varlse
+#' @rdname fitted
 #' @export
 fitted.bvarflat <- function(object, ...) {
   object$fitted.values
 }
 
-#' @rdname fitted.varlse
+#' @rdname fitted
 #' @export
 fitted.bvharmn <- function(object, ...) {
   object$fitted.values
 }
 
-#' See if the Object a class in this package
-#' 
-#' This function returns `TRUE` if the input is the [class] defined by this package.
-#' 
-#' @param x Object
-#' 
-#' @return logical class
-#' 
+#' @rdname var_lm
+#' @param x Any object
 #' @export
 is.varlse <- function(x) {
   inherits(x, "varlse")
 }
 
-#' @rdname is.varlse
+#' @rdname vhar_lm
+#' @param x Any object
 #' @export
 is.vharlse <- function(x) {
   inherits(x, "vharlse")
 }
 
-#' @rdname is.varlse
+#' @rdname bvar_minnesota
+#' @param x Any object
 #' @export
 is.bvarmn <- function(x) {
   inherits(x, "bvarmn")
 }
 
-#' @rdname is.varlse
+#' @rdname bvar_flat
+#' @param x Any object
 #' @export
 is.bvarflat <- function(x) {
   inherits(x, "bvarflat")
 }
 
-#' @rdname is.varlse
+#' @rdname bvhar_minnesota
+#' @param x Any object
 #' @export
 is.bvharmn <- function(x) {
   inherits(x, "bvharmn")
 }
 
-#' @rdname is.varlse
+#' @rdname var_lm
+#' @export
+is.bvharmod <- function(x) {
+  inherits(x, "bvharmod")
+}
+
+#' @rdname predict
+#' @param x Any object
 #' @export
 is.predbvhar <- function(x) {
   inherits(x, "predbvhar")
 }
 
-#' @rdname is.varlse
+#' @rdname forecast_roll
+#' @param x Any object
 #' @export
 is.bvharcv <- function(x) {
   inherits(x, "bvharcv")
 }
 
-#' @rdname is.varlse
+#' @rdname irf
+#' @param x Any object
+#' @export
+is.bvharirf <- function(x) {
+  inherits(x, "bvharirf")
+}
+
+#' @rdname set_bvar
+#' @param x Any object
 #' @export
 is.bvharspec <- function(x) {
   inherits(x, "bvharspec")
 }
 
-#' @rdname is.varlse
+#' @rdname set_lambda
+#' @param x Any object
 #' @export
 is.bvharpriorspec <- function(x) {
   inherits(x, "bvharpriorspec")
 }
 
-#' @rdname is.varlse
+#' @rdname choose_bvar
+#' @param x Any object
 #' @export
 is.bvharemp <- function(x) {
   inherits(x, "bvharemp")
 }
 
-#' @rdname is.varlse
+#' @rdname bound_bvhar
+#' @param x Any object
 #' @export
 is.boundbvharemp <- function(x) {
   inherits(x, "boundbvharemp")
 }
 
-#' @rdname is.varlse
+#' @rdname set_intercept
+#' @param x Any object
 #' @export
 is.interceptspec <- function(x) {
   inherits(x, "interceptspec")
 }
 
-#' @rdname is.varlse
+#' @rdname set_ssvs
+#' @param x Any object
 #' @export
 is.ssvsinput <- function(x) {
   inherits(x, "ssvsinput")
 }
 
-#' @rdname is.varlse
-#' @export
-is.ssvsinit <- function(x) {
-  inherits(x, "ssvsinit")
-}
-
-#' @rdname is.varlse
-#' @export
-is.bvharpriorspec <- function(x) {
-  inherits(x, "bvharpriorspec")
-}
-
-#' @rdname is.varlse
+#' @rdname set_horseshoe
+#' @param x Any object
 #' @export
 is.horseshoespec <- function(x) {
   inherits(x, "horseshoespec")
 }
 
-#' @rdname is.varlse
+#' @rdname set_ng
+#' @param x Any object
+#' @export
+is.ngspec <- function(x) {
+  inherits(x, "ngspec")
+}
+
+#' @rdname set_dl
+#' @param x Any object
+#' @export
+is.dlspec <- function(x) {
+  inherits(x, "dlspec")
+}
+
+#' @rdname set_gdp
+#' @param x Any object
+#' @export
+is.gdpspec <- function(x) {
+  inherits(x, "gdpspec")
+}
+
+#' @rdname set_ldlt
+#' @param x Any object
+#' @export
+is.covspec <- function(x) {
+  inherits(x, "covspec")
+}
+
+#' @rdname set_ldlt
+#' @param x Any object
 #' @export
 is.svspec <- function(x) {
   inherits(x, "svspec")
+}
+
+#' @rdname set_ldlt
+#' @param x Any object
+#' @export
+is.ldltspec <- function(x) {
+  inherits(x, "ldltspec")
 }

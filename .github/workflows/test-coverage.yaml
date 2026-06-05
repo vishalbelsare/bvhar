@@ -11,6 +11,9 @@ name: test-coverage
 jobs:
   test-coverage:
     runs-on: ubuntu-latest
+
+    if: ${{ !contains(github.event.head_commit.message, '[only pages]') }}
+    
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
 
@@ -32,7 +35,8 @@ jobs:
           covr::codecov(
             quiet = FALSE,
             clean = FALSE,
-            install_path = file.path(Sys.getenv("RUNNER_TEMP"), "package")
+            install_path = file.path(Sys.getenv("RUNNER_TEMP"), "package"),
+            flags = "r-package"
           )
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

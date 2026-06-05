@@ -1,0 +1,7 @@
+pybind11
+scikit-build-core
+numpy
+pandas
+pytest
+jupyter
+quartodoc

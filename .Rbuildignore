@@ -15,3 +15,11 @@
 ^cran-comments\.md$
 ^CRAN-SUBMISSION$
 ^revdep$
+^python$
+inst/doxygen
+CMakeLists.txt
+inst/examples
+^cmake$
+^cmake-build$
+^logo$
+^vignettes/forecasting\.Rmd$

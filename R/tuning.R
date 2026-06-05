@@ -83,7 +83,7 @@ logml_bvar <- function(param, eps = 1e-04, y, p, include_mean = TRUE, ...) {
 
 #' Finding the Set of Hyperparameters of Individual Bayesian Model
 #' 
-#' Instead of these functions, you can use [choose_bayes()].
+#' `r lifecycle::badge("deprecated")` Instead of these functions, you can use [choose_bayes()].
 #' 
 #' @param bayes_spec Initial Bayes model specification.
 #' @param lower `r lifecycle::badge("experimental")` Lower bound. By default, `.01`.
@@ -96,7 +96,7 @@ logml_bvar <- function(param, eps = 1e-04, y, p, include_mean = TRUE, ...) {
 #' @param parallel List the same argument of [optimParallel::optimParallel()]. By default, this is empty, and the function does not execute parallel computation.
 #' @details 
 #' Empirical Bayes method maximizes marginal likelihood and selects the set of hyperparameters.
-#' These functions implement `"L-BFGS-B"` method of [stats::optim()] to find the maximum of marginal likelihood.
+#' These functions implement `L-BFGS-B` method of [stats::optim()] to find the maximum of marginal likelihood.
 #' 
 #' If you want to set `lower` and `upper` option more carefully,
 #' deal with them like as in [stats::optim()] in order of [set_bvar()], [set_bvhar()], or [set_weight_bvhar()]'s argument (except `eps`).
@@ -130,6 +130,11 @@ choose_bvar <- function(bayes_spec = set_bvar(),
                         p, 
                         include_mean = TRUE,
                         parallel = list()) {
+  deprecate_warn(
+    "2.3.0.9012",
+    "choose_bvar()",
+    "bvar_minnesota()"
+  )
   dim_data <- ncol(y)
   if (!is.bvharspec(bayes_spec)) {
     stop("Provide 'bvharspec' for 'bayes_spec'.")
@@ -280,7 +285,7 @@ logml_bvhar_vhar <- function(param, eps = 1e-04, y, har = c(5, 22), include_mean
 #' @param har Numeric vector for weekly and monthly order. By default, `c(5, 22)`.
 #' @param include_mean Add constant term (Default: `TRUE`) or not (`FALSE`)
 #' @param parallel List the same argument of [optimParallel::optimParallel()]. By default, this is empty, and the function does not execute parallel computation.
-#' @references Kim, Y. G., and Baek, C. (2023+). *Bayesian vector heterogeneous autoregressive modeling*. Journal of Statistical Computation and Simulation.
+#' @references Kim, Y. G., and Baek, C. (2024). *Bayesian vector heterogeneous autoregressive modeling*. Journal of Statistical Computation and Simulation, 94(6), 1139-1157.
 #' @importFrom stats optim
 #' @importFrom optimParallel optimParallel
 #' @order 1
@@ -294,6 +299,11 @@ choose_bvhar <- function(bayes_spec = set_bvhar(),
                          har = c(5, 22),
                          include_mean = TRUE,
                          parallel = list()) {
+  deprecate_warn(
+    "2.3.0.9012",
+    "choose_bvhar()",
+    "bvhar_minnesota()"
+  )
   dim_data <- ncol(y)
   if (!is.bvharspec(bayes_spec)) {
     stop("Provide 'bvharspec' for 'bayes_spec'.")
@@ -427,7 +437,7 @@ choose_bvhar <- function(bayes_spec = set_bvhar(),
 
 #' Setting Empirical Bayes Optimization Bounds
 #' 
-#' `r lifecycle::badge("experimental")` This function sets lower and upper bounds for [set_bvar()], [set_bvhar()], or [set_weight_bvhar()].
+#' `r lifecycle::badge("deprecated")` This function sets lower and upper bounds for [set_bvar()], [set_bvhar()], or [set_weight_bvhar()].
 #' 
 #' @param init_spec Initial Bayes model specification
 #' @param lower_spec Lower bound Bayes model specification
@@ -501,7 +511,7 @@ bound_bvhar <- function(init_spec = set_bvhar(),
 
 #' Finding the Set of Hyperparameters of Bayesian Model
 #' 
-#' `r lifecycle::badge("experimental")` This function chooses the set of hyperparameters of Bayesian model using [stats::optim()] function.
+#' `r lifecycle::badge("deprecated")` This function chooses the set of hyperparameters of Bayesian model using [stats::optim()] function.
 #' 
 #' @param bayes_bound Empirical Bayes optimization bound specification defined by [bound_bvhar()].
 #' @param ... Additional arguments for [stats::optim()].
@@ -524,7 +534,7 @@ bound_bvhar <- function(init_spec = set_bvhar(),
 #' @references 
 #' Giannone, D., Lenza, M., & Primiceri, G. E. (2015). *Prior Selection for Vector Autoregressions*. Review of Economics and Statistics, 97(2).
 #' 
-#' Kim, Y. G., and Baek, C. (n.d.). *Bayesian vector heterogeneous autoregressive modeling*. submitted.
+#' Kim, Y. G., and Baek, C. (2024). *Bayesian vector heterogeneous autoregressive modeling*. Journal of Statistical Computation and Simulation, 94(6), 1139-1157.
 #' @order 1
 #' @export
 choose_bayes <- function(bayes_bound = bound_bvhar(),
@@ -534,6 +544,11 @@ choose_bayes <- function(bayes_bound = bound_bvhar(),
                          order = c(5, 22),
                          include_mean = TRUE,
                          parallel = list()) {
+  deprecate_warn(
+    "2.3.0.9012",
+    "choose_bayes()",
+    "Hyperparameter selection in Minnesota prior will be automatically done"
+  )
   dim_data <- ncol(y)
   if (!is.boundbvharemp(bayes_bound)) {
     stop("Provide 'bayes_bound' for 'boundbvharemp'. See ?bound_bvhar.")
@@ -574,119 +589,4 @@ choose_bayes <- function(bayes_bound = bound_bvhar(),
       )
     }
   )
-}
-
-#' Choose the Hyperparameters Set of SSVS-VAR using a Default Semiautomatic Approach
-#' 
-#' `r lifecycle::badge("experimental")`
-#' This function chooses \eqn{(\tau_{0i}, \tau_{1i})} and \eqn{(\kappa_{0i}, \kappa_{1i})}
-#' using a default semiautomatic approach.
-#' 
-#' @param y Time series data of which columns indicate the variables.
-#' @param ord Order for VAR or VHAR.
-#' @param type Model type (Default: `"VAR"` or `"VHAR"`).
-#' @param param Preselected constants \eqn{c_0 << c_1}. By default, `0.1` and `10` (See Details).
-#' @param include_mean Add constant term (Default: `TRUE`) or not (`FALSE`).
-#' @param gamma_param Parameters (shape, rate) for Gamma distribution. This is for the output.
-#' @param mean_non Prior mean of unrestricted coefficients. This is for the output.
-#' @param sd_non Standard deviance of unrestricted coefficients. This is for the output.
-#' @details 
-#' Instead of using subjective values of \eqn{(\tau_{0i}, \tau_{1i})}, we can use
-#' \deqn{\tau_{ki} = c_k \hat{VAR(OLS)}}
-#' It must be \eqn{c_0 << c_1}.
-#' 
-#' In case of \eqn{(\omega_{0ij}, \omega_{1ij})},
-#' \deqn{\omega_{kij} = c_k = \hat{VAR(OLS)}}
-#' similarly.
-#' @return `ssvsinput` object
-#' @references 
-#' George, E. I., & McCulloch, R. E. (1993). *Variable Selection via Gibbs Sampling*. Journal of the American Statistical Association, 88(423), 881–889.
-#' 
-#' George, E. I., Sun, D., & Ni, S. (2008). *Bayesian stochastic search for VAR model restrictions*. Journal of Econometrics, 142(1), 553–580.
-#' 
-#' Koop, G., & Korobilis, D. (2009). *Bayesian Multivariate Time Series Methods for Empirical Macroeconomics*. Foundations and Trends® in Econometrics, 3(4), 267–358.
-#' @export
-choose_ssvs <- function(y, 
-                        ord, 
-                        type = c("VAR", "VHAR"), 
-                        param = c(.1, 10),
-                        include_mean = TRUE,
-                        gamma_param = c(.01, .01),
-                        mean_non = 0,
-                        sd_non = .1) {
-  type <- match.arg(type)
-  if (param[1] >= param[2]) {
-    stop("'param[2]' should be larger than 'param[1]'.")
-  }
-  res <- switch(
-    type,
-    "VAR" = {
-      fit <- var_lm(y, p = ord, include_mean = FALSE)
-      fit_infer <- infer_var(fit)$summary_stat
-      mean_coef <- fit_infer[,1]
-      sd_coef <- fit_infer[,2]
-      if (include_mean) {
-        fit <- var_lm(y, p = ord, include_mean = TRUE)
-        mean_non <- fit$coef[fit$df,]
-      }
-      sd_chol <- chol(fit$covmat)
-      sd_chol <- sd_chol[upper.tri(sd_chol, diag = FALSE)]
-      list(
-        coef_spike = param[1] * sd_coef,
-        coef_slab = param[2] * sd_coef,
-        coef_mixture = .5,
-        coef_s1 = 1,
-        coef_s2 = 1,
-        # mean_coef = mean_coef,
-        mean_non = mean_non,
-        sd_non = sd_non,
-        process = "VAR",
-        prior = "SSVS",
-        shape = gamma_param[1],
-        rate = gamma_param[2],
-        chol_spike = param[1] * sd_chol,
-        chol_slab = param[2] * sd_chol,
-        chol_mixture = .5,
-        chol_s1 = 1,
-        chol_s2 = 1
-      )
-    },
-    "VHAR" = {
-      if (missing(ord)) {
-        ord <- c(5, 22)
-      }
-      fit <- vhar_lm(y, har = ord, include_mean = include_mean)
-      fit_infer <- infer_vhar(fit)$summary_stat
-      sd_coef <- fit_infer[,2]
-      
-      if (include_mean) {
-        id_const <- seq(from = fit$df, to = fit$df * fit$m, by = fit$df)
-        mean_non <- fit_infer[id_const, 1]
-        sd_coef <- fit_infer[-id_const]
-      }
-      sd_chol <- chol(fit$covmat)
-      sd_chol <- sd_chol[upper.tri(sd_chol, diag = FALSE)]
-      list(
-        coef_spike = param[1] * sd_coef,
-        coef_slab = param[2] * sd_coef,
-        coef_mixture = .5,
-        coef_s1 = 1,
-        coef_s2 = 1,
-        # mean_coef = mean_coef,
-        mean_non = mean_non,
-        sd_non = sd_non,
-        process = "VHAR",
-        prior = "SSVS",
-        shape = gamma_param[1],
-        rate = gamma_param[2],
-        chol_spike = param[1] * sd_chol,
-        chol_slab = param[2] * sd_chol,
-        chol_mixture = .5,
-        chol_s1 = 1,
-        chol_s2 = 1
-      )
-    }
-  )
-  class(res) <- "ssvsinput"
-  res
 }

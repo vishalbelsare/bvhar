@@ -18,11 +18,11 @@ knitr::opts_chunk$set(
 options(digits = 3)
 ```
 
-# bvhar <img src='man/figures/logo.png' align="right" height="139" />
+# bvhar <img src="man/figures/logo.png" align="right" height="139" alt="" />
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/ygeunkim/bvhar/actions/workflows/R-CMD-check.yaml/badge.svg?branch=master)](https://github.com/ygeunkim/bvhar/actions/workflows/R-CMD-check.yaml?query=branch%3Amaster)
-[![Codecov test coverage](https://codecov.io/gh/ygeunkim/bvhar/graph/badge.svg)](https://app.codecov.io/gh/ygeunkim/bvhar)
+[![Codecov test coverage](https://codecov.io/gh/ygeunkim/bvhar/graph/badge.svg?flag=r-package)](https://app.codecov.io/gh/ygeunkim/bvhar)
 [![CRAN status](https://www.r-pkg.org/badges/version/bvhar)](https://CRAN.R-project.org/package=bvhar)
 [![monthly downloads](https://cranlogs.r-pkg.org/badges/last-month/bvhar?color=blue)](https://cran.r-project.org/package=bvhar)
 [![total downloads](https://cranlogs.r-pkg.org/badges/grand-total/bvhar?color=blue)](https://cran.r-project.org/package=bvhar)
@@ -30,7 +30,7 @@ options(digits = 3)
 
 ## Overview
 
-`bvhar` provides functions to analyze multivariate time series time series using
+`bvhar` provides functions to analyze and forecast multivariate time series using
 
 - VAR
 - VHAR (Vector HAR)
@@ -49,7 +49,7 @@ install.packages("bvhar")
 
 <!-- dev badges: start -->
 [![dev-r-cmd-check](https://github.com/ygeunkim/bvhar/actions/workflows/R-CMD-check.yaml/badge.svg?branch=develop)](https://github.com/ygeunkim/bvhar/actions/workflows/R-CMD-check.yaml?query=branch%3Adevelop)
-[![dev-codecov](https://codecov.io/github/ygeunkim/bvhar/branch/develop/graph/badge.svg)](https://codecov.io/github/ygeunkim/bvhar)
+[![dev-codecov](https://codecov.io/github/ygeunkim/bvhar/branch/develop/graph/badge.svg?flag=r-package)](https://app.codecov.io/gh/ygeunkim/bvhar/tree/develop)
 [![Development version updated](https://img.shields.io/github/last-commit/ygeunkim/bvhar/develop?label=dev%20updated)](https://github.com/ygeunkim/bvhar/tree/develop)
 <!-- dev badges: end -->
 
@@ -59,6 +59,11 @@ You can install the development version from [develop branch](https://github.com
 # install.packages("remotes")
 remotes::install_github("ygeunkim/bvhar@develop")
 ```
+
+We started to develop a Python version in python directory.
+
+- [bvhar for Python](https://bvhar.baeconverse.org/python/)
+- [Source code](https://github.com/ygeunkim/bvhar/tree/master/python)
 
 ## Models
 
@@ -73,13 +78,16 @@ Repeatedly, `bvhar` is a research tool to analyze multivariate time series model
 |:-----:|:--------:|:-----:|  
 | VAR | `var_lm()` | |  
 | VHAR | `vhar_lm()` | |  
-| BVAR | `bvar_minnesota()` | Minnesota |  
-| BVHAR | `bvhar_minnesota()` | Minnesota |  
-| BVAR-SV | `bvar_sv()` | SSVS, Horseshoe |  
-| BVHAR-SV | `bvhar_sv()` | SSVS, Horseshoe |  
+| BVAR | `bvar_minnesota()` | Minnesota (will move to `var_bayes()`) |  
+| BVHAR | `bvhar_minnesota()` | Minnesota (will move to `vhar_bayes()`) |  
+| BVAR | `var_bayes()` | SSVS, Horseshoe, Minnesota, NG, DL, GDP |  
+| BVHAR | `vhar_bayes()` | SSVS, Horseshoe, Minnesota, NG, DL, GDP |  
 
 This readme document shows forecasting procedure briefly.
 Details about each function are in vignettes and help documents.
+<!-- Note that each `bvar_minnesota()` and `bvhar_minnesota()` will be integrated into `var_bayes()` and `vhar_bayes()` and removed in the near future. -->
+Details will be updated after the function integration works are done.
+Until then, we remove Bayesian model sections here.
 
 h-step ahead forecasting:
 
@@ -125,76 +133,11 @@ forecast_vhar <- predict(mod_vhar, h)
 
 ### BVAR
 
-Minnesota prior:
-
-```{r specbvar}
-lam <- .3
-delta <- rep(1, ncol(etf_vix)) # litterman
-sig <- apply(etf_tr, 2, sd)
-eps <- 1e-04
-(bvar_spec <- set_bvar(sig, lam, delta, eps))
-```
-
-```{r fitbvar}
-mod_bvar <- bvar_minnesota(y = etf_tr, p = 5, bayes_spec = bvar_spec)
-```
-
-MSE:
-
-```{r }
-forecast_bvar <- predict(mod_bvar, h)
-(msebvar <- mse(forecast_bvar, etf_te))
-```
+<!-- var_bayes() -->
 
 ### BVHAR
 
-BVHAR-S:
-
-```{r specbvhars}
-(bvhar_spec_v1 <- set_bvhar(sig, lam, delta, eps))
-```
-
-```{r fitbvhars}
-mod_bvhar_v1 <- bvhar_minnesota(y = etf_tr, bayes_spec = bvhar_spec_v1)
-```
-
-MSE:
-
-```{r predbvhars}
-forecast_bvhar_v1 <- predict(mod_bvhar_v1, h)
-(msebvhar_v1 <- mse(forecast_bvhar_v1, etf_te))
-```
-
-BVHAR-L:
-
-```{r specbvharl}
-day <- rep(.1, ncol(etf_vix))
-week <- rep(.1, ncol(etf_vix))
-month <- rep(.1, ncol(etf_vix))
-#----------------------------------
-(bvhar_spec_v2 <- set_weight_bvhar(sig, lam, eps, day, week, month))
-```
-
-```{r fitbvharl}
-mod_bvhar_v2 <- bvhar_minnesota(y = etf_tr, bayes_spec = bvhar_spec_v2)
-```
-
-MSE:
-
-```{r predbvharl}
-forecast_bvhar_v2 <- predict(mod_bvhar_v2, h)
-(msebvhar_v2 <- mse(forecast_bvhar_v2, etf_te))
-```
-
-## Plots
-
-```{r predfig}
-autoplot(forecast_var, x_cut = 870, ci_alpha = .7, type = "wrap") +
-  autolayer(forecast_vhar, ci_alpha = .6) +
-  autolayer(forecast_bvar, ci_alpha = .4) +
-  autolayer(forecast_bvhar_v1, ci_alpha = .2) +
-  autolayer(forecast_bvhar_v2, ci_alpha = .1)
-```
+<!-- vhar_bayes() -->
 
 ## Citation
 

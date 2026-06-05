@@ -6,8 +6,8 @@
 #' @param mu Mean vector
 #' @param sig Variance matrix
 #' @param method Method to compute \eqn{\Sigma^{1/2}}.
-#' Choose between `"eigen"` (spectral decomposition) and `"chol"` (cholesky decomposition).
-#' By default, `"eigen"`.
+#' Choose between `eigen` (spectral decomposition) and `chol` (cholesky decomposition).
+#' By default, `eigen`.
 #' @details
 #' Consider \eqn{x_1, \ldots, x_n \sim N_m (\mu, \Sigma)}.
 #' 
@@ -23,9 +23,9 @@ sim_mnormal <- function(num_sim, mu = rep(0, 5), sig = diag(5), method = c("eige
     stop("'sig' must be a symmetric matrix.")
   }
   if (method == "eigen") {
-    return( sim_mgaussian(num_sim, mu, sig) )
+    return( sim_mgaussian_export(num_sim, mu, sig) )
   }
-  sim_mgaussian_chol(num_sim, mu, sig)
+  sim_mgaussian_chol_export(num_sim, mu, sig)
 }
 
 #' Generate Multivariate t Random Vector
@@ -37,8 +37,8 @@ sim_mnormal <- function(num_sim, mu = rep(0, 5), sig = diag(5), method = c("eige
 #' @param mu Location vector
 #' @param sig Scale matrix.
 #' @param method Method to compute \eqn{\Sigma^{1/2}}.
-#' Choose between `"eigen"` (spectral decomposition) and `"chol"` (cholesky decomposition).
-#' By default, `"eigen"`.
+#' Choose between `eigen` (spectral decomposition) and `chol` (cholesky decomposition).
+#' By default, `eigen`.
 #' @return T x k matrix
 #' @export
 sim_mvt <- function(num_sim, df, mu, sig, method = c("eigen", "chol")) {
@@ -47,9 +47,9 @@ sim_mvt <- function(num_sim, df, mu, sig, method = c("eigen", "chol")) {
     stop("'sig' must be a symmetric matrix.")
   }
   if (method == "eigen") {
-    return( sim_mstudent(num_sim, df, mu, sig, 1) )
+    return( sim_mstudent_export(num_sim, df, mu, sig, 1) )
   }
-  sim_mstudent(num_sim, df, mu, sig, 2)
+  sim_mstudent_export(num_sim, df, mu, sig, 2)
 }
 
 #' Generate Multivariate Time Series Process Following VAR(p)
@@ -58,15 +58,15 @@ sim_mvt <- function(num_sim, df, mu, sig, method = c("eigen", "chol")) {
 #' 
 #' @param num_sim Number to generated process
 #' @param num_burn Number of burn-in
-#' @param var_coef VAR coefficient. The format should be the same as the output of [coef.varlse()] from [var_lm()]
+#' @param var_coef VAR coefficient. The format should be the same as the output of [coef()] from [var_lm()]
 #' @param var_lag Lag of VAR
 #' @param sig_error Variance matrix of the error term. By default, `diag(dim)`.
 #' @param init Initial y1, ..., yp matrix to simulate VAR model. Try `matrix(0L, nrow = var_lag, ncol = dim)`.
 #' @param method Method to compute \eqn{\Sigma^{1/2}}.
-#' Choose between `"eigen"` (spectral decomposition) and `"chol"` (cholesky decomposition).
-#' By default, `"eigen"`.
+#' Choose between `eigen` (spectral decomposition) and `chol` (cholesky decomposition).
+#' By default, `eigen`.
 #' @param process Process to generate error term.
-#' `"gaussian"`: Normal distribution (default) or `"student"`: Multivariate t-distribution.
+#' `gaussian`: Normal distribution (default) or `student`: Multivariate t-distribution.
 #' @param t_param `r lifecycle::badge("experimental")` argument for MVT, e.g. DF: 5.
 #' @details 
 #' 1. Generate \eqn{\epsilon_1, \epsilon_n \sim N(0, \Sigma)}
@@ -106,10 +106,40 @@ sim_var <- function(num_sim,
   if (!(nrow(init) == var_lag && ncol(init) == dim_data)) {
     stop("'init' is (var_lag, dim) matrix in order of y1, y2, ..., yp.")
   }
-  if (method == "eigen") {
-    return( sim_var_eigen(num_sim, num_burn, var_coef, var_lag, sig_error, init, process, t_param) )
-  }
-  sim_var_chol(num_sim, num_burn, var_coef, var_lag, sig_error, init, process, t_param)
+  process_id <- ifelse(process == "gaussian", 1, 2)
+  method_id <- ifelse(method == "eigen", 1, 2)
+  sim_var_process(num_sim, num_burn, var_coef, var_lag, sig_error, t_param, init, process_id, method_id, sample.int(.Machine$integer.max, size = 1))
+  # if (method == "eigen") {
+  #   return( sim_var_eigen(num_sim, num_burn, var_coef, var_lag, sig_error, init, process, t_param) )
+  # }
+  # sim_var_chol(num_sim, num_burn, var_coef, var_lag, sig_error, init, process, t_param)
+}
+
+#' Generate Normal-IW Random Family
+#'
+#' This function samples normal inverse-wishart matrices.
+#'
+#' @param num_sim Number to generate
+#' @param mat_mean Mean matrix of MN
+#' @param mat_scale_u First scale matrix of MN
+#' @param mat_scale Scale matrix of IW
+#' @param shape Shape of IW
+#' @param u_prec If `TRUE`, use `mat_scale_u` as its inverse. By default, `FALSE`.
+#' @details
+#' Consider \eqn{(Y_i, \Sigma_i) \sim MIW(M, U, \Psi, \nu)}.
+#'
+#' 1. Generate upper triangular factor of \eqn{\Sigma_i = C_i C_i^T} in the upper triangular Bartlett decomposition.
+#' 2. Standard normal generation: n x k matrix \eqn{Z_i = [z_{ij} \sim N(0, 1)]} in row-wise direction.
+#' 3. Lower triangular Cholesky decomposition: \eqn{U = P P^T}
+#' 4. \eqn{A_i = M + P Z_i C_i^T}
+#' @export
+sim_mniw <- function(num_sim, mat_mean, mat_scale_u, mat_scale, shape, u_prec = FALSE) {
+  res <-
+    sim_mniw_export(num_sim, mat_mean, mat_scale_u, mat_scale, shape, u_prec) |>
+    simplify2array() |>
+    apply(1, function(x) x)
+  names(res) <- c("mn", "iw")
+  res
 }
 
 #' Generate Multivariate Time Series Process Following VAR(p)
@@ -118,16 +148,16 @@ sim_var <- function(num_sim,
 #' 
 #' @param num_sim Number to generated process
 #' @param num_burn Number of burn-in
-#' @param vhar_coef VAR coefficient. The format should be the same as the output of [coef.varlse()] from [var_lm()]
+#' @param vhar_coef VAR coefficient. The format should be the same as the output of [coef()] from [var_lm()]
 #' @param week Weekly order of VHAR. By default, `5`.
 #' @param month Weekly order of VHAR. By default, `22`.
 #' @param sig_error Variance matrix of the error term. By default, `diag(dim)`.
 #' @param init Initial y1, ..., yp matrix to simulate VAR model. Try `matrix(0L, nrow = month, ncol = dim)`.
 #' @param method Method to compute \eqn{\Sigma^{1/2}}.
-#' Choose between `"eigen"` (spectral decomposition) and `"chol"` (cholesky decomposition).
-#' By default, `"eigen"`.
+#' Choose between `eigen` (spectral decomposition) and `chol` (cholesky decomposition).
+#' By default, `eigen`.
 #' @param process Process to generate error term.
-#' `"gaussian"`: Normal distribution (default) or `"student"`: Multivariate t-distribution.
+#' `gaussian`: Normal distribution (default) or `student`: Multivariate t-distribution.
 #' @param t_param `r lifecycle::badge("experimental")` argument for MVT, e.g. DF: 5.
 #' @details 
 #' Let \eqn{M} be the month order, e.g. \eqn{M = 22}.
@@ -174,8 +204,11 @@ sim_vhar <- function(num_sim,
   if (!(nrow(init) == month && ncol(init) == dim_data)) {
     stop("'init' is (month, dim) matrix in order of y1, y2, ..., y_month.")
   }
-  if (method == "eigen") {
-    return( sim_vhar_eigen(num_sim, num_burn, vhar_coef, week, month, sig_error, init, process, t_param) )
-  }
-  sim_vhar_chol(num_sim, num_burn, vhar_coef, week, month, sig_error, init, process, t_param)
+  process_id <- ifelse(process == "gaussian", 1, 2)
+  method_id <- ifelse(method == "eigen", 1, 2)
+  sim_vhar_process(num_sim, num_burn, vhar_coef, week, month, sig_error, t_param, init, process_id, method_id, sample.int(.Machine$integer.max, size = 1))
+  # if (method == "eigen") {
+  #   return( sim_vhar_eigen(num_sim, num_burn, vhar_coef, week, month, sig_error, init, process, t_param) )
+  # }
+  # sim_vhar_chol(num_sim, num_burn, vhar_coef, week, month, sig_error, init, process, t_param)
 }

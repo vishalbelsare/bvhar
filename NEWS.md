@@ -1,3 +1,252 @@
+# bvhar 2.4.1
+
+* Fixed Average LPL computation process in pseudo out-of-sample forecasting.
+
+* Added IRF classes in C++.
+
+## R
+
+* Fixed wrong post-processing of MCMC posterior draws. This can change the results of post-analysis of the old code.
+
+## Python
+
+* `-DBVHAR_USE_PYBIND11` macro is required to use the header with Pybind11.
+
+## C++
+
+* Added boost.Random-based constructor for each MCMC initial values struct.
+
+* Now header-only C++ library is available.
+
+* Use [`Catch2`](https://github.com/catchorg/Catch2) for C++ unit tests.
+
+# bvhar 2.4.0
+
+## Important changes
+
+* License has been changed to [MIT](https://choosealicense.com/licenses/mit/).
+
+* `bvhar`-related packages now use `boost::random::mixmax` instead of `boost::random::mt19937` for pRNG, which is the same with Stan.
+This will affect every MCMC results of this library.
+
+* Fixed DL prior's latent parameter sampling.
+
+* Fixed upper triangular Bartlett decomposition for inverse-Wishart rng.
+This change affects every results that uses MNIW in the posterior sampling.
+
+* `bvar_minnesota()` and `bvhar_minnesota()` will find hyperparameters in C++ using L-BFGS-B of `LBFGSpp` library.
+And these functions will be integrated into `var_bayes()` and `vhar_bayes()` with new spec functions.
+Be careful when using these functions before the changes.
+
+* `spdlog` loggers are replaced with custom progress bar (for master thread) by default.
+If defining `BVHAR_USE_SPDLOG`, spdlog will be used.
+
+## New features
+
+* `var_bayes()` and `vhar_bayes()` can augment factor term with `factor_spec` argument.
+
+* `set_factor()` determines the factor size.
+
+* `predict()` can conduct in-sample forecasting when `n_ahead` is not specified (for now, only `*ldlt` and `*sv` can do this).
+
+## Internal changes (C++)
+
+* Remove `fmt::format()` which gave an error in C++20.
+
+* Pseudo out-of-sample forecast classes have `isPath` template, which can give the path forecasting also in the rolling and expanding windows.
+
+* Add `baecon` namespace wrapper around `bvhar` namespace in preparation for `baecon` verse-package integration.
+C++ users must update namespace references from `bvhar::` to `baecon::bvhar::`.
+
+* Use forecaster classes with new `AutoregGenerator` class for VAR/VHAR generation.
+
+* This gives different results due to boost RNG usage instead of R's RNG.
+
+* Add `BVHAR_` prefix to every defined macros. For example, `LIST` to `BVHAR_LIST`.
+
+* Also, replace `USE_RCPP` and `USE_BVHAR_DEBUG` with `BVHAR_USE_RCPP` and `BVHAR_USE_BVHAR_DEBUG`.
+
+* Add `use_fit` parameter to `McmcOutForecastRun` in the case when full sample analysis.
+If `use_fit = false`, the first window will be evaluated.
+
+# bvhar 2.3.0
+
+* Requires `R >= 4.2` due to Rtools 4.0 error with optional parameters in C++.
+
+* Changed `bayes_spec` argument into `coef_spec` and `contem_spec` to enable different priors
+
+* Added `mcmc` option in `forecast_roll()` and `forecast_expand()` for `ldltmod` and `svmod` classes.
+
+## Exogenous variables
+
+* `var_lm()` and `vhar_lm()` can run VARX and VHARX via `exogen` and `s`.
+
+* `var_bayes()` and `vhar_bayes()` can run Bayesian VARX and VHARX via `exogen`, `s`, and `exogen_spec`.
+
+* `exogen_spec` determines the prior for the exogenous term.
+
+* When forecasting these VARX and VHARX models, `predict()` requires `newxreg`.
+
+## Internal changes (C++)
+
+* Added `shrinkage` headers for strategy design pattern.
+
+* Added `McmcParams`, `McmcAlgo`, and `McmcRun` (changed original `McmcRun` to `CtaRun`) for extensibility of MCMC algorithms.
+
+* Also added base forecaster classes.
+
+* Changed the way OLS spillover classes work.
+
+* Added `OlsSpilloverRun` and `OlsDynamicSpillover` for volatility spillover in OLS.
+
+* If defining `USE_BVHAR_DEBUG` macro variable when compiling, users can see debug messages.
+
+# bvhar 2.2.2
+
+* Fix `unlist()` error in print methods for `r-devel` (4.5.0).
+
+# bvhar 2.2.1
+
+# bvhar 2.2.0
+
+* Requires `R >= 4.1` following [tidyverse R version support schedule](https://tidyverse.org/blog/2019/04/r-version-support/)
+
+* `stable = TRUE` can filter MCMC draws where coefficient is stable when forecasting.
+
+* Changed Eigen and boost assertion behavior (`eigen_assert` and `BOOST_ASSERT`) to give error instead of abort.
+
+* Transpose the predictive distribution update loop.
+
+* `med = TRUE` gives median of forecast draws as point forecast.
+
+* `var_bayes()` and `vhar_bayes()` can choose to use only group shrinkage parameters without global parameter with `ggl = FALSE` option.
+
+* `set_gdp()` can use Generalized Double Pareto (GDP) shrinkage prior.
+
+* `alpl()` gives summary of LPL across every horizon.
+
+### Internal changes
+
+* Apply Devroye (2014) to draw GIG instead of Hörmann and Leydold.
+
+* Use `spdlog` (using `RcppSpdlog`) logger instead of custom progress bar (`bvharprogress`).
+
+* Use `RcppThread` to make the logger thread-safe ([eddelbuettel/rcppspdlog#22](https://github.com/eddelbuettel/rcppspdlog/issues/22))
+
+* Use inverse-gamma prior for group parameters in DL.
+
+* SAVS penalty is zero in own-lag.
+
+### Removal or deprecation
+
+* Removed `sim_gig()` R function.
+
+## C++ Header file changes
+
+* Use template to avoid code duplicates among LDLT and SV models.
+
+* Can easily conduct MCMC using `McmcRun` class in C++ source.
+
+* Can easily implement forecasting for LDLT and SV MCMC using `McmcVarforecastRun<>` and `McmcVharforecastRun<>`.
+
+* Can easily use rolling and expanding forecast for LDLT ans SV MCMC using `McmcVarforecastRun<>` and `McmcVharforecastRun<>`.
+
+## Removal of deprecated functions
+
+* Removed bvar_sv() and bvhar_sv().
+
+* Removed bvar_ssvs(), bvhar_ssvs(), init_ssvs(), choose_ssvs(), sim_ssvs_var(), and sim_ssvs_vhar().
+
+* Removed bvar_horseshoe(), bvhar_horseshoe(), sim_horseshoe_var(), and sim_horseshoe_vhar().
+
+# bvhar 2.1.2
+
+* Fix MCMC algorithm for `include_mean = TRUE` case.
+
+* Fix predictive distribution update codes (`predict()`, `forecast_roll()`, and `forecast_expand()` for `ldltmod` and `svmod` classes).
+
+* Fix out-of-forecasting (`forecast_roll()` and `forecast_expand()`) result process codes.
+
+# bvhar 2.1.1
+
+* When using GIG generation in MCMC, it has maximum iteration numbers of while statement.
+
+* Defined `USE_RCPP` macro in the C++ header so that Rcpp source usage works fine.
+
+# bvhar 2.1.0
+
+* Use Signal Adaptive Variable Selector (SAVS) to generate sparse coefficient from shrinkage priors.
+
+* `var_bayes()` and `vhar_bayes()` now handle both shrinkage priors and stochastic volatility.
+
+* `bvar_ssvs()`, `bvar_horseshoe()`, `bvar_sv()`, `bvhar_ssvs()`, `bvhar_horseshoe()`, and `bvhar_sv()` are deprecated, and will be removed in v2.1.0 with their source functions.
+
+* `set_horseshoe()` has additional setting for `group_shrinkage`. Horseshoe sampling now has additional group shrinkage level parameters.
+
+* `set_ssvs()` now additionally should specify different Beta hyperparameters for each own-lag and cross-lag.
+
+* `set_ssvs()` sets scaling factor and inverse-gamma hyperparameters for coefficients and cholesky factor slab sd.
+
+* Use full bayesian approach to SSVS spike and slab sd's instead of semi-automatic approach, in `var_bayes()` and `vhar_bayes()`.
+
+* MCMC functions return give `$param` and `$param_names`, not individual `$*_record` members.
+
+* `sim_gig()` generates Generalized Inverse Gaussian (GIG) random numbers using the algorithm of R package `GIGrvg`.
+
+## New priors
+
+* `set_dl()` specifies Dirichlet-Laplace (DL) prior in `var_bayes()` and `vhar_bayes()`.
+
+* `set_ng()` specifies Normal-Gamma (NG) prior in `var_bayes()` and `vhar_bayes()`.
+
+* `bvar_sv()` and `bvhar_sv()` supports hierarchical Minnesota prior.
+
+## Internal changes
+
+* Added regularization step in internal Normal posterior generation function against non-existing LLT case.
+
+* Added `BOOST_DISABLE_ASSERTS` flag against `boost` asserts.
+
+## Spillover effects
+
+* `spillover()` computes static spillover given model.
+
+* `dynamic_spillover()` computes dynamic spillover given model.
+
+## Forecasting
+
+* `predict()`, `forecast_roll()`, and `forecast_expand()` with LDLT models can use CI level when adding sparsity.
+
+* `predict()`, `forecast_roll()`, and `forecast_expand()` of `ldltmod` have `sparse` option to use sparsity.
+
+* `predict()`, `forecast_roll()`, and `forecast_expand()` with SV models can use CI level when adding sparsity.
+
+* `predict()`, `forecast_roll()`, and `forecast_expand()` of `svmod` have `sparse` option to use sparsity.
+
+* Out-of-sample forecasting functions are now S3 generics (`forecast_roll()` and `forecast_expand()`).
+
+* Add Rolling-window forecasting for LDLT models (`forecast_roll.ldltmod()`).
+
+* Add Expanding-window forecasting for LDLT models (`forecast_expand.ldltmod()`).
+
+* Add Rolling-window forecasting for SV models (`forecast_roll.svmod()`).
+
+* Add Expanding-window forecasting for SV models (`forecast_expand.svmod()`).
+
+* When forecasting SV models, it is available to choose whether to use time-varying covariance (`use_sv` option, which is `TRUE` by default).
+
+* `forecast_roll()` and `forecast_expand()` can implement OpenMP multithreading, except in `bvarflat` class.
+
+* If the model uses multiple chain MCMC, static schedule is used in `forecast_roll()` and dynamic schedule in `forecast_expand()`.
+
+* `sim_mniw()` output format has been changed into list of lists.
+
+* Now can use MNIW generation by including header (`std::vector<Eigen::MatrixXd> sim_mn_iw(...)`).
+
+* Compute LPL inside `forecast_roll.svmod()` and `forecast_expand.svmod()` using `lpl` option.
+
+* Instead, `lpl` method is removed.
+
 # bvhar 2.0.1
 
 * Fix internal vectorization and unvectorization behavior.
